@@ -130,7 +130,12 @@ struct BookWebView: NSViewRepresentable {
         func loadPending() {
             guard rulesReady, let (url, root) = pending else { return }
             pending = nil
-            web?.loadFileURL(url, allowingReadAccessTo: root)
+            // WebKit treats a fragment-only change as same-document navigation and
+            // skips didFinish. Always load the document, then restore its target below.
+            var document = URLComponents(url: url, resolvingAgainstBaseURL: false)
+            document?.fragment = nil
+            guard let documentURL = document?.url else { return }
+            web?.loadFileURL(documentURL, allowingReadAccessTo: root)
         }
 
         private func evaluate(_ script: String, in web: WKWebView?) {
@@ -156,7 +161,12 @@ struct BookWebView: NSViewRepresentable {
             let restoringRequest = request
             let anchorJSON = restorePoint?.anchor.map(String.init) ?? "null"
             let offset = restorePoint?.offset ?? 0
-            var script = hasFragment ? "void(0)" : """
+            let fragment = state.location.flatMap { URLComponents(url: $0, resolvingAgainstBaseURL: false)?.fragment } ?? ""
+            let fragmentJSON = String(data: try! JSONSerialization.data(withJSONObject: [fragment]), encoding: .utf8)!
+            var script = hasFragment ? """
+            (()=>{const id=\(fragmentJSON)[0];const target=document.getElementById(id)||document.getElementsByName(id)[0];
+            if(target){target.scrollIntoView({block:'start'});}else{scrollTo(0,0);}})();
+            """ : """
             (()=>{const nodes=document.querySelectorAll('p,h1,h2,h3,h4,li,blockquote,pre,figure');
             const index=\(anchorJSON),max=Math.max(0,document.documentElement.scrollHeight-innerHeight);
             let y=max*\(fraction);

@@ -18,6 +18,11 @@ def write(name, contents):
         for path, content in contents.items():
             archive.writestr(path, content)
 write('中文 空格.epub', files)
+reader_files = dict(files)
+reader_files['OPS/第一 章.xhtml'] = ('<html xmlns="http://www.w3.org/1999/xhtml"><head><title>Reader interaction fixture</title></head><body>'
+    '<h1>Reading</h1>' + ''.join(f'<p>Paragraph {i}: A quiet moment for reading. 世界🙂 メモ.</p>' for i in range(35))
+    + '<h2 id="section2">A section farther down</h2><p id="passage">A passage to highlight 世界🙂.</p></body></html>')
+write('reader.epub', reader_files)
 write('fallback.epub', {k: v for k, v in files.items() if k != 'OPS/nav.xhtml'})
 write('traversal.epub', {**files, '../escape': 'bad'})
 write('drm.epub', {**files, 'META-INF/encryption.xml': '<encryption><EncryptedData><EncryptionMethod Algorithm="http://www.w3.org/2001/04/xmlenc#aes128-cbc"/></EncryptedData></encryption>'})

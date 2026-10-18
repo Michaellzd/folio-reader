@@ -88,6 +88,7 @@ Install Apple's Command Line Tools (`xcode-select --install`). Swift 6+ and macO
 ```sh
 ./test.sh
 ./test-web.sh
+./test-reader.sh
 ./build.sh
 open build/Folio.app
 ./package.sh
@@ -99,7 +100,7 @@ The build creates a universal application with both `arm64` and `x86_64` executa
 ./test.sh /path/to/your-book.epub
 ```
 
-The fixture suite checks EPUB3 navigation, nesting, anchor links, Unicode and escaped filenames, missing-TOC fallback, spine selection, four-language translation coverage, ZIP corruption, path traversal, symlinks, encryption, and truncated archives. Persistence tests cover restart recovery, file moves, multilingual notes, highlight metadata, edits, deletion, damaged storage, and write failures. `test-web.sh` exercises the actual system WebKit with author scripts disabled, including Unicode and inline selections, exact highlight ranges, duplicate passages, overlapping colors, safe note rendering, repeat rendering, removal, and the native note-click bridge. Real books and personal notes are never included in this repository or release.
+The fixture suite checks EPUB3 navigation, nesting, anchor links, Unicode and escaped filenames, missing-TOC fallback, spine selection, four-language translation coverage, ZIP corruption, path traversal, symlinks, encryption, and truncated archives. Persistence tests cover restart recovery, file moves, multilingual notes, highlight metadata, edits, deletion, damaged storage, and write failures. `test-web.sh` exercises the actual system WebKit with author scripts disabled, including Unicode and inline selections, exact highlight ranges, duplicate passages, overlapping colors, safe note rendering, repeat rendering, removal, and the native note-click bridge. `test-reader.sh` exercises the complete SwiftUI/WebKit reader with isolated storage: opening a book, jumping to a section in the same chapter, receiving selections, rendering a highlight, attaching a note, repeated navigation, switching chapters, and returning to a saved note. Real books and personal notes are never included in this repository or release.
 
 See [AGENTS.md](AGENTS.md) for the code map and contribution rules, [DESIGN.md](DESIGN.md) for visual choices, and [RELEASING.md](RELEASING.md) for publishing.
 

@@ -17,7 +17,7 @@ Read PRODUCT.md and DESIGN.md before changing the UI. The initial design used Ta
 - `Sources/AnnotationScript.swift`: exact selection ranges and reversible DOM highlight rendering.
 - `Sources/MarksView.swift`: saved-item sidebar, note editor, and selection toolbar.
 - `Resources/`: app metadata and icon. `Tools/`: reproducible icon generation.
-- `Tests/`: original generated EPUB fixtures and parser/localization checks.
+- `Tests/`: original generated EPUB fixtures, parser/localization checks, and complete SwiftUI/WebKit reader interaction tests using isolated storage.
 
 ## Build and check
 
@@ -26,6 +26,7 @@ Requires macOS 14+, Apple's Command Line Tools with Swift 6+, and Python 3 for t
 ```sh
 ./test.sh
 ./test-web.sh
+./test-reader.sh
 ./build.sh
 ./package.sh
 ```
@@ -37,6 +38,7 @@ Pass explicit local EPUB paths to `./test.sh /path/to/book.epub` for additional 
 - Keep book content local. JavaScript from books is disabled; remote subresources are blocked before loading a page.
 - Restrict reading and navigation to the extracted book directory. Preserve ZIP traversal, symlink, encryption, CRC, and size checks.
 - Use callback-based `evaluateJavaScript` for scripts that return `undefined`: some macOS async overlays force-unwrap the result and crash.
+- Load chapter files without fragments, then scroll to their anchors after loading. WebKit can skip `didFinish` for fragment-only navigation; never leave reading actions waiting for that callback. Run `test-reader.sh` when changing navigation or annotation state.
 - Preserve EPUB content and structure; avoid book-specific markup rewrites.
 - Add every new UI string to all four languages; preserve localization placeholders.
 - Save settings locally and avoid telemetry. App UI language never translates or edits book content.

@@ -31,7 +31,7 @@ final class ReaderState: ObservableObject {
     var highlightedMark: ReadingMark? { marks.first { $0.id == highlightedMarkID } }
     @Published var draftColor = HighlightColor.yellow
     weak var webView: WKWebView?
-    private let store = ReadingStore()
+    private let store: ReadingStore
     private var record = ReadingRecord()
     private var storageAvailable = true
     private var saveTask: Task<Void, Never>?
@@ -43,6 +43,7 @@ final class ReaderState: ObservableObject {
     var restoreMark: UUID?
     private var anchor: Int?
     private var anchorOffset: Double?
+    init(store: ReadingStore = ReadingStore()) { self.store = store }
     @Published var language = AppLanguage.initial {
         didSet { UserDefaults.standard.set(language.rawValue, forKey: "language") }
     }

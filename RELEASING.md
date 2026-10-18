@@ -1,6 +1,6 @@
 # Publishing
 
-Run `./test.sh`, inspect the actual application, then `./package.sh`. The packaged app is ad hoc signed, not Apple-notarized. Keep this limitation visible in README and release notes until a Developer ID signing and notarization workflow is configured.
+Run `./test.sh`, `./test-web.sh`, and `./test-reader.sh`, inspect the actual application, then `./package.sh`. The packaged app is ad hoc signed, not Apple-notarized. Keep this limitation visible in README and release notes until a Developer ID signing and notarization workflow is configured.
 
 The first publication can be performed with GitHub CLI:
 
