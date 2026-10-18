@@ -1,0 +1,22 @@
+Folio / 书页 — EPUB reader for macOS
+
+Requires macOS 14 or later. Supports Apple Silicon and Intel Macs.
+
+1. Unzip this download.
+2. Move 书页.app to Applications.
+3. Open it, then choose Open EPUB or press Command-O.
+   You can also drop an EPUB onto the window or use Finder's Open With.
+
+Choose 简体中文, English, 日本語, or Español from the reading settings
+at the top right. Your selection is saved. Books stay in their original language.
+
+This build has an ad hoc signature and is not notarized by Apple.
+If macOS blocks the downloaded app, try opening it once, then go to
+System Settings > Privacy & Security > Open Anyway.
+
+中文：解压后把“书页.app”拖到“应用程序”，打开后选择 EPUB。
+日语：解凍後、アプリを「アプリケーション」に移動し、EPUBを開いてください。
+Español: Descomprime, mueve la app a Aplicaciones y abre un EPUB.
+
+Source, updates, and issues: https://github.com/Michaellzd/folio-reader
+License: MIT. Copyright (c) 2026 Michael Lu.
