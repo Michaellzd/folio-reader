@@ -10,11 +10,14 @@ struct BookWebView: NSViewRepresentable {
         config.defaultWebpagePreferences.allowsContentJavaScript = false
         config.websiteDataStore = .nonPersistent()
         config.userContentController.add(context.coordinator, name: "position")
+        config.userContentController.add(context.coordinator, name: "selection")
+        config.userContentController.add(context.coordinator, name: "annotation")
         let web = WKWebView(frame: .zero, configuration: config)
         web.navigationDelegate = context.coordinator
         web.setValue(false, forKey: "drawsBackground")
         web.allowsBackForwardNavigationGestures = false
         context.coordinator.web = web
+        state.webView = web
         // Prevent remote resources embedded in a local book from making network requests.
         let coordinator = context.coordinator
         WKContentRuleListStore.default().compileContentRuleList(forIdentifier: "FolioLocalOnly", encodedContentRuleList:
@@ -31,17 +34,25 @@ struct BookWebView: NSViewRepresentable {
     func updateNSView(_ web: WKWebView, context: Context) {
         let coordinator = context.coordinator
         let style = Self.style(size: state.fontSize, dark: state.dark)
+        let highlights = state.highlightsJSON
+        if coordinator.highlights != highlights {
+            coordinator.highlights = highlights
+            web.evaluateJavaScript(AnnotationScript.render(highlights), completionHandler: nil)
+        }
         if coordinator.style != style {
             coordinator.style = style
             web.configuration.userContentController.removeAllUserScripts()
-            web.configuration.userContentController.addUserScript(WKUserScript(source: Self.script(style), injectionTime: .atDocumentEnd, forMainFrameOnly: true))
+            web.configuration.userContentController.addUserScript(WKUserScript(source: Self.script(style, request: state.request), injectionTime: .atDocumentEnd, forMainFrameOnly: true))
             web.evaluateJavaScript(Self.applyStyle(style))
         }
         guard coordinator.request != state.request, let url = state.location, let book = state.book else { return }
         coordinator.request = state.request
+        web.configuration.userContentController.removeAllUserScripts()
+        web.configuration.userContentController.addUserScript(WKUserScript(source: Self.script(style, request: state.request), injectionTime: .atDocumentEnd, forMainFrameOnly: true))
         coordinator.restoring = true
         coordinator.restoreScroll = state.restoreScroll
-        coordinator.hasFragment = url.fragment != nil
+        coordinator.restorePoint = state.restorePoint
+        coordinator.hasFragment = url.fragment != nil && state.restorePoint == nil
         coordinator.pending = (url, book.root)
         coordinator.loadPending()
     }
@@ -49,6 +60,8 @@ struct BookWebView: NSViewRepresentable {
     static func dismantleNSView(_ web: WKWebView, coordinator: Coordinator) {
         web.stopLoading()
         web.configuration.userContentController.removeScriptMessageHandler(forName: "position")
+        web.configuration.userContentController.removeScriptMessageHandler(forName: "selection")
+        web.configuration.userContentController.removeScriptMessageHandler(forName: "annotation")
         web.navigationDelegate = nil
     }
 
@@ -77,10 +90,27 @@ struct BookWebView: NSViewRepresentable {
         (()=>{let s=document.getElementById('folio-reading-style'); if(!s){s=document.createElement('style');s.id='folio-reading-style';document.head.appendChild(s);}s.textContent=\(json)[0];})();
         """
     }
-    static func script(_ style: String) -> String {
+    static func script(_ style: String, request: UUID) -> String {
         applyStyle(style) + """
-        ;(()=>{let timer;window.addEventListener('scroll',()=>{clearTimeout(timer);timer=setTimeout(()=>{const h=Math.max(0,document.documentElement.scrollHeight-innerHeight);window.webkit.messageHandlers.position.postMessage(h?scrollY/h:0);},180);},{passive:true});})();
-        """
+        ;(()=>{
+            window.folioRequest='\(request.uuidString)';
+            const selector='p,h1,h2,h3,h4,li,blockquote,pre,figure';
+            window.folioSnapshot=()=>{
+                const max=Math.max(0,document.documentElement.scrollHeight-innerHeight);
+                const nodes=Array.from(document.querySelectorAll(selector));
+                let anchor=null,offset=null;
+                if(scrollY>1){
+                    const index=nodes.findIndex(el=>{const r=el.getBoundingClientRect();return r.height>0&&r.bottom>0;});
+                    if(index>=0){const r=nodes[index].getBoundingClientRect();anchor=index;offset=-r.top/Math.max(1,r.height);}
+                }
+                return {scroll:max?scrollY/max:0,anchor,offset,quote:String(window.getSelection()||'').slice(0,4000),selection:window.folioSelection?window.folioSelection():null};
+            };
+            let queued=false;
+            const report=()=>{if(queued)return;queued=true;requestAnimationFrame(()=>{queued=false;window.webkit.messageHandlers.position.postMessage({...window.folioSnapshot(),request:'\(request.uuidString)'});});};
+            window.addEventListener('scroll',report,{passive:true});
+            window.addEventListener('pagehide',report);
+        })();
+        """ + AnnotationScript.source
     }
 
     @MainActor final class Coordinator: NSObject, WKNavigationDelegate, WKScriptMessageHandler {
@@ -88,8 +118,10 @@ struct BookWebView: NSViewRepresentable {
         weak var web: WKWebView?
         var request: UUID?
         var style = ""
+        var highlights = ""
         var restoring = false
         var restoreScroll = 0.0
+        var restorePoint: ReadingPoint?
         var hasFragment = false
         var rulesReady = false
         var pending: (URL, URL)?
@@ -107,13 +139,33 @@ struct BookWebView: NSViewRepresentable {
         }
 
         func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
-            guard !restoring, let fraction = message.body as? Double else { return }
-            state.receivePosition(fraction)
+            guard !restoring, let snapshot = message.body as? [String: Any], snapshot["request"] as? String == state.request.uuidString else { return }
+            switch message.name {
+            case "selection": state.selection = ReaderState.decodeSelection(snapshot["selection"])
+            case "annotation":
+                if let id = snapshot["id"] as? String, let mark = state.marks.first(where: { $0.id.uuidString == id }) { state.editNote(mark) }
+            default:
+                if let fraction = snapshot["scroll"] as? Double {
+                    state.receivePosition(fraction, anchor: snapshot["anchor"] as? Int, offset: snapshot["offset"] as? Double)
+                }
+            }
         }
         func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
             let fraction = restoreScroll
+            evaluate(AnnotationScript.render(state.highlightsJSON), in: webView)
             let restoringRequest = request
-            let script = hasFragment ? "void(0)" : "window.scrollTo(0,Math.max(0,document.documentElement.scrollHeight-innerHeight)*\(fraction))"
+            let anchorJSON = restorePoint?.anchor.map(String.init) ?? "null"
+            let offset = restorePoint?.offset ?? 0
+            var script = hasFragment ? "void(0)" : """
+            (()=>{const nodes=document.querySelectorAll('p,h1,h2,h3,h4,li,blockquote,pre,figure');
+            const index=\(anchorJSON),max=Math.max(0,document.documentElement.scrollHeight-innerHeight);
+            let y=max*\(fraction);
+            if(index!==null&&nodes[index]){const r=nodes[index].getBoundingClientRect();y=scrollY+r.top+r.height*\(offset);}
+            scrollTo(0,Math.min(max,Math.max(0,y)));})();
+            """
+            if let mark = state.restoreMark {
+                script += ";document.querySelector('mark[data-folio-id=\"\(mark.uuidString)\"]')?.scrollIntoView({block:'center'});"
+            }
             // A second restoration after images/fonts settle prevents tall covers from moving the saved position.
             evaluate(script, in: webView)
             Task { @MainActor [weak self, weak webView] in
@@ -121,6 +173,8 @@ struct BookWebView: NSViewRepresentable {
                 guard let self, self.request == restoringRequest, self.state.request == restoringRequest else { return }
                 self.evaluate(script, in: webView)
                 self.restoring = false
+                self.state.pageReady = true
+                self.evaluate("window.dispatchEvent(new Event('scroll'))", in: webView)
             }
         }
         func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction, decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {

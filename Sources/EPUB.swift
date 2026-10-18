@@ -1,5 +1,6 @@
 import Foundation
 import zlib
+import CryptoKit
 
 enum BookError: LocalizedError {
     case invalid(String)
@@ -16,6 +17,7 @@ struct Chapter: Identifiable, Sendable {
 }
 
 struct EPUBBook: Sendable {
+    let identifier: String
     let title: String
     let author: String
     let root: URL
@@ -125,7 +127,8 @@ struct EPUBBook: Sendable {
             let coverID = package.descendants("meta").first(where: { $0.attributes["name"] == "cover" })?.attributes["content"]
             let cover = manifest.values.first(where: { $0.properties.contains("cover-image") })?.url
                 ?? coverID.flatMap { manifest[$0]?.url }
-            return EPUBBook(title: title, author: author, root: root, source: source,
+            let identifier = SHA256.hash(data: try Data(contentsOf: source, options: .mappedIfSafe)).map { String(format: "%02x", $0) }.joined()
+            return EPUBBook(identifier: identifier, title: title, author: author, root: root, source: source,
                             spine: spine, chapters: chapters, cover: cover)
         } catch {
             try? FileManager.default.removeItem(at: root)

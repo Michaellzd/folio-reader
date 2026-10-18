@@ -10,6 +10,7 @@ struct FolioApp: App {
             ReaderView(state: state)
                 .frame(minWidth: 620, minHeight: 440)
                 .preferredColorScheme(state.dark ? .dark : .light)
+                .environment(\.locale, Locale(identifier: state.language.rawValue))
                 .onAppear { NSApp.setActivationPolicy(.regular); NSApp.activate(ignoringOtherApps: true) }
         }
         .defaultSize(width: 1120, height: 800)
@@ -17,6 +18,10 @@ struct FolioApp: App {
         .commands {
             CommandGroup(replacing: .newItem) {
                 Button(state.t("打开 EPUB…"), action: state.chooseFile).keyboardShortcut("o")
+            }
+            CommandGroup(after: .saveItem) {
+                Button(state.t(state.noteEditor ? "保存笔记" : "保存书签")) { if state.noteEditor { state.saveNote() } else { state.saveBookmark() } }.keyboardShortcut("s").disabled(!state.pageReady)
+                Button(state.t("添加笔记"), action: state.newNote).keyboardShortcut("n", modifiers: [.command, .shift]).disabled(!state.pageReady)
             }
             CommandMenu(state.t("阅读")) {
                 Button(state.t("上一节")) { state.turn(-1) }.keyboardShortcut(.leftArrow, modifiers: .command).disabled(state.book == nil || state.chapterIndex == 0)
@@ -36,6 +41,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     func applicationDidFinishLaunching(_ notification: Notification) {
         if let path = CommandLine.arguments.dropFirst().first(where: { $0.lowercased().hasSuffix(".epub") }) {
             ReaderState.shared.open(URL(fileURLWithPath: path))
+        } else if let path = UserDefaults.standard.string(forKey: "lastBook"), FileManager.default.fileExists(atPath: path) {
+            DispatchQueue.main.async {
+                if ReaderState.shared.book == nil && !ReaderState.shared.isLoading { ReaderState.shared.open(URL(fileURLWithPath: path)) }
+            }
         }
     }
     func application(_ application: NSApplication, open urls: [URL]) {
@@ -59,15 +68,29 @@ struct ReaderView: View {
             if let book = state.book {
                 HStack(spacing: 0) {
                     if state.sidebar {
-                        contents(book)
+                        VStack(spacing: 0) {
+                            Picker("", selection: $state.showAnnotations) {
+                                Text(state.t("目录")).tag(false)
+                                Text(state.t("书签与笔记")).tag(true)
+                            }.pickerStyle(.segmented).labelsHidden().padding(14)
+                            if state.showAnnotations { MarksView(state: state) }
+                            else { contents(book) }
+                        }
                             .frame(width: 270)
                         Rectangle().fill(state.muted.opacity(0.15)).frame(width: 1)
                     }
                     VStack(spacing: 0) {
+                        if let message = state.storageError {
+                            Text(state.t(message)).font(.system(size: 12)).padding(12).frame(maxWidth: .infinity)
+                                .background(state.accent.opacity(0.15)).accessibilityAddTraits(.updatesFrequently)
+                        }
                         if let message = state.webError {
                             ContentUnavailableView { Label(state.t("暂时无法显示"), systemImage: "doc.text") } description: { Text(state.t(message)) }
                         } else {
                             BookWebView(state: state)
+                                .overlay(alignment: .bottom) {
+                                    if state.selection != nil { SelectionToolbar(state: state).padding(16) }
+                                }
                         }
                         footer(book)
                     }
@@ -106,6 +129,7 @@ struct ReaderView: View {
             Button(state.t("重新选择…"), action: state.chooseFile)
             Button(state.t("好"), role: .cancel) { state.error = nil }
         } message: { Text(state.t(state.error ?? "")) }
+        .sheet(isPresented: $state.noteEditor) { NoteEditorView(state: state) }
     }
 
     private var toolbar: some View {
@@ -119,6 +143,12 @@ struct ReaderView: View {
                 .buttonStyle(.plain).font(.system(size: 13)).help(state.t("打开 EPUB") + " (⌘O)")
                 .disabled(state.isLoading)
             Spacer(minLength: 20)
+            if state.book != nil {
+                tool(state.t(state.saveFeedback ? "已保存" : "保存书签"), icon: state.saveFeedback ? "bookmark.fill" : "bookmark") { state.saveBookmark() }
+                    .disabled(!state.pageReady)
+                tool(state.t("添加笔记"), icon: "square.and.pencil") { state.newNote() }.disabled(!state.pageReady)
+                tool(state.t("书签与笔记"), icon: "text.book.closed") { state.sidebar = true; state.showAnnotations.toggle() }
+            }
             if let book = state.book {
                 Text(book.title).font(.system(size: 12, weight: .medium)).foregroundStyle(state.muted)
                     .lineLimit(1).truncationMode(.middle)
@@ -218,8 +248,12 @@ struct ReaderView: View {
             }.accessibilityLabel(state.t("上一节"))
                 .disabled(state.chapterIndex == 0).help(state.t("上一节") + " (⌘←)")
             Spacer()
-            Text(state.sectionLabel(book.spine.count))
-                .monospacedDigit().lineLimit(1).accessibilityLabel(state.sectionLabel(book.spine.count))
+            HStack(spacing: 6) {
+                Text(state.sectionLabel(book.spine.count)).monospacedDigit().lineLimit(1)
+                if state.lastSavedAt != nil && state.storageError == nil {
+                    Image(systemName: "checkmark").accessibilityLabel(state.t("进度已自动保存"))
+                }
+            }.help(state.t("进度自动保存在本机，下次启动继续阅读。"))
             Spacer()
             Button { state.turn(1) } label: {
                 HStack(spacing: 5) {

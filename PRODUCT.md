@@ -25,3 +25,6 @@ The user explicitly requested Chinese, English, Japanese, and Spanish. First lau
 
 ## Open source
 The user requested public source, AGENTS.md, README with links to their other products (using Michaellzd/ownwords as the reference), and downloadable release assets. GitHub publication requires a connected account; never describe an unpushed local repository as published.
+
+## Saved reading and annotations
+The user requested closing and reopening without losing their place, manual saves/bookmarks, colored text highlights, and notes attached to highlighted passages. All associated UI must follow the selected language. Document the workflows in README. Persist reading data locally; retain original excerpts and note text. Opening the last available book automatically is authorized by this request.

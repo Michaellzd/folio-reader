@@ -10,6 +10,16 @@ Requires macOS 14 or later. Supports Apple Silicon and Intel Macs.
 Choose 简体中文, English, 日本語, or Español from the reading settings
 at the top right. Your selection is saved. Books stay in their original language.
 
+Your last book and reading position reopen automatically. Command-S saves a
+bookmark. Select book text to choose a highlight color or add a note. Click a
+highlight to edit its note. Saved items are listed in Bookmarks & notes.
+All of these controls follow your interface language. Notes save only when
+you click Save note or use its shortcut; Cancel discards editor changes.
+
+Progress, bookmarks, highlights, and notes stay on this Mac in:
+~/Library/Application Support/Folio/
+Back up this folder to preserve your notes. There is no cloud sync.
+
 This build has an ad hoc signature and is not notarized by Apple.
 If macOS blocks the downloaded app, try opening it once, then go to
 System Settings > Privacy & Security > Open Anyway.

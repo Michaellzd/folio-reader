@@ -11,10 +11,11 @@ fi
 git rev-parse --is-inside-work-tree >/dev/null
 [[ -z "$(git status --porcelain)" ]] || { print -u2 "Commit source changes before publishing."; exit 1; }
 ./test.sh
+./test-web.sh
 ./package.sh
 VERSION=$(/usr/libexec/PlistBuddy -c 'Print CFBundleShortVersionString' Resources/Info.plist)
 gh repo create "$REPO" --public --source . --remote origin --push \
   --description 'A small, local EPUB reader for macOS. Native SwiftUI, four interface languages, no account.'
 gh release create "v$VERSION" --repo "$REPO" --target main --title "Folio $VERSION" \
-  --notes-file RELEASE-NOTES.md dist/*.zip dist/SHA256SUMS
+  --notes-file RELEASE-NOTES.md "dist/Folio-$VERSION-macOS-universal.zip" dist/Folio-macOS-universal.zip dist/SHA256SUMS
 print "Published: https://github.com/$REPO/releases/tag/v$VERSION"

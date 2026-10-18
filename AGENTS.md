@@ -13,6 +13,9 @@ Read PRODUCT.md and DESIGN.md before changing the UI. The initial design used Ta
 - `Sources/BookWebView.swift`: local WebKit rendering and reading CSS.
 - `Sources/FolioApp.swift`: SwiftUI window, native application delegate, menus, contents, appearance.
 - `Sources/Localization.swift`: Chinese, English, Japanese, Spanish UI strings and system-language detection.
+- `Sources/ReadingStore.swift`: atomic local progress, bookmarks, highlight ranges, and notes; EPUB.swift computes stable content fingerprints.
+- `Sources/AnnotationScript.swift`: exact selection ranges and reversible DOM highlight rendering.
+- `Sources/MarksView.swift`: saved-item sidebar, note editor, and selection toolbar.
 - `Resources/`: app metadata and icon. `Tools/`: reproducible icon generation.
 - `Tests/`: original generated EPUB fixtures and parser/localization checks.
 
@@ -22,6 +25,7 @@ Requires macOS 14+, Apple's Command Line Tools with Swift 6+, and Python 3 for t
 
 ```sh
 ./test.sh
+./test-web.sh
 ./build.sh
 ./package.sh
 ```
@@ -36,6 +40,8 @@ Pass explicit local EPUB paths to `./test.sh /path/to/book.epub` for additional 
 - Preserve EPUB content and structure; avoid book-specific markup rewrites.
 - Add every new UI string to all four languages; preserve localization placeholders.
 - Save settings locally and avoid telemetry. App UI language never translates or edits book content.
+- Preserve text offsets in UTF-16, quotes, and their context when saving highlights. Applying or removing marks must preserve original book text. Test duplicate passages, overlapping marks, non-Latin text, and the native click bridge.
+- Keep note writes atomic. Surface read/write failures and avoid overwriting unreadable saved data. Fingerprints preserve data across file moves; never silently reset a book's notes.
 - Exclude real books, personal paths, credentials, generated archives, caches, crash logs, and private user data from commits and release assets.
 
 ## Releases

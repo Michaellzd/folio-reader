@@ -7,8 +7,8 @@ struct ParserTests {
         let args = Array(CommandLine.arguments.dropFirst())
         let fixtureRoot = URL(fileURLWithPath: args[0])
         var checks = 0
-        func expect(_ condition: @autoclosure () -> Bool, _ message: String) throws {
-            guard condition() else { throw BookError.invalid("FAIL: " + message) }
+        func expect(_ condition: @autoclosure () throws -> Bool, _ message: String) throws {
+            guard try condition() else { throw BookError.invalid("FAIL: " + message) }
             checks += 1
         }
         for (key, row) in L10n.translations {
@@ -38,6 +38,12 @@ struct ParserTests {
         try expect(book.chapters[0].url.lastPathComponent == "第一 章.xhtml", "Escaped Unicode resource path")
         try expect(book.chapters[1].url.fragment == "section2", "Anchor navigation")
         try expect(book.cover != nil, "EPUB3 cover metadata")
+        let movedSource = fixtureRoot.appendingPathComponent("moved.epub")
+        try? FileManager.default.removeItem(at: movedSource)
+        try FileManager.default.copyItem(at: fixtureRoot.appendingPathComponent("中文 空格.epub"), to: movedSource)
+        let moved = try EPUBBook.load(movedSource)
+        defer { try? FileManager.default.removeItem(at: moved.root) }
+        try expect(book.identifier == moved.identifier && book.identifier.count == 64, "Moving a book preserves its data identity")
         try expect(book.spineIndex(for: book.chapters[1].url) == 0, "Anchor maps to spine page")
         try expect(localURL("../escape", relativeTo: book.root, root: book.root) == nil, "Traversal rejected")
         try expect(localURL("https://example.com", relativeTo: book.root, root: book.root) == nil, "Remote URL rejected")
@@ -54,6 +60,39 @@ struct ParserTests {
                 checks += 1
             }
         }
+        let store = ReadingStore(directory: fixtureRoot.appendingPathComponent("reading-data-" + UUID().uuidString))
+        defer { try? FileManager.default.removeItem(at: store.directory) }
+        try expect(try store.load(book.identifier) == ReadingRecord(), "New book has empty saved data")
+        let point = ReadingPoint(path: "OPS/%E7%AC%AC%E4%B8%80%20%E7%AB%A0.xhtml", scroll: 0.61, anchor: 7, offset: 0.35)
+        let bookmark = ReadingMark(kind: .bookmark, point: point, section: "第一章")
+        var note = ReadingMark(kind: .note, point: point, section: "第一章", quote: "Original excerpt 日本語", text: "中文 · English · 日本語 · Español\nSecond line")
+        var record = ReadingRecord(position: point, marks: [bookmark, note])
+        let selected = TextSelection(start: 6, end: 12, quote: "世界🙂", prefix: "Alpha ", suffix: " repeated")
+        let highlight = ReadingMark(kind: .highlight, point: point, section: "第一章", quote: selected.quote, selection: selected, color: .pink)
+        record.marks.append(highlight)
+        try store.save(record, for: book.identifier)
+        let reloadedStore = ReadingStore(directory: store.directory)
+        try expect(try reloadedStore.load(moved.identifier) == record, "Progress, bookmarks, quotes, and multilingual notes survive restart and file moves")
+        note.text = "Edited note"
+        record.marks = [note]
+        try store.save(record, for: book.identifier)
+        try expect(try store.load(book.identifier).marks == [note], "Note edits and bookmark deletion persist without changing note identity")
+        try expect(try store.load(fallback.identifier).marks.isEmpty, "Different books do not share notes")
+        let malformedPoint = ReadingPoint(path: "chapter.xhtml", scroll: .infinity, anchor: -2, offset: .nan)
+        try expect(malformedPoint.scroll == 0 && malformedPoint.anchor == nil && malformedPoint.offset == nil, "Invalid scroll values are normalized")
+        let dataURL = store.directory.appendingPathComponent(book.identifier + ".json")
+        try Data("broken data".utf8).write(to: dataURL)
+        do { _ = try store.load(book.identifier); throw BookError.invalid("FAIL: silently discarded damaged notes") }
+        catch let error as BookError { if error.localizedDescription.hasPrefix("FAIL:") { throw error } }
+        catch { checks += 1 }
+        do { _ = try store.load("../escape"); throw BookError.invalid("FAIL: unsafe store identifier") }
+        catch let error as BookError { if error.localizedDescription.hasPrefix("FAIL:") { throw error }; checks += 1 }
+        let blocked = fixtureRoot.appendingPathComponent("blocked-store-" + UUID().uuidString)
+        try Data().write(to: blocked)
+        defer { try? FileManager.default.removeItem(at: blocked) }
+        do { try ReadingStore(directory: blocked).save(record, for: book.identifier); throw BookError.invalid("FAIL: ignored save error") }
+        catch let error as BookError { if error.localizedDescription.hasPrefix("FAIL:") { throw error } }
+        catch { checks += 1 }
         print("PASS \(checks) checks")
     }
 }
