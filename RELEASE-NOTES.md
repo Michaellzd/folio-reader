@@ -1,14 +1,8 @@
-Folio 1.1.1 uses the English product name **Folio** everywhere.
+Folio 1.1.2 improves the highlight-to-note flow.
 
-- The macOS application is now **Folio.app**.
-- App display names, window titles, and in-app branding use Folio in every interface language.
-- README, installation instructions, and release assets use the same name.
-- The existing app identifier and reading-data locations are retained, so reading progress, bookmarks, highlights, notes, and preferences carry over.
+- Saving a colored highlight shows a **Highlighted** confirmation with an **Add note** button.
+- Add note opens the exact highlighted passage with its chosen color. Saving updates the same highlight instead of creating a duplicate.
+- Dismissing the prompt or canceling the note editor keeps the saved highlight. Selecting another passage or navigating clears the prompt.
+- The confirmation and controls follow Chinese, English, Japanese, or Spanish, matching your interface language.
 
-Download **Folio-macOS-universal.zip**, unzip it, and move **Folio.app** to Applications. Requires macOS 14 or later. The universal app contains Apple Silicon and Intel builds; Apple Silicon is tested locally and Intel is cross-compiled.
-
-The app includes automatic reading-position saves, manual bookmarks, four highlight colors, and passage notes, with Chinese, English, Japanese, and Spanish interfaces.
-
-This build is ad hoc signed and not Apple-notarized. macOS may require **System Settings → Privacy & Security → Open Anyway** after the first launch attempt.
-
-Reading data remains local in ~/Library/Application Support/Folio/. No books or personal notes are bundled.
+Download **Folio-macOS-universal.zip**, unzip it, and move **Folio.app** to Applications. Requires macOS 14 or later. Includes Apple Silicon and Intel support. The app uses an ad hoc signature and is not Apple-notarized; see README for first-open instructions.

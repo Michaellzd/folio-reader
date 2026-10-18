@@ -24,7 +24,11 @@ final class ReaderState: ObservableObject {
     @Published var draftQuote = ""
     @Published var storageError: String?
     @Published var lastSavedAt: Date?
-    @Published var selection: TextSelection?
+    @Published var selection: TextSelection? {
+        didSet { if selection != nil { highlightedMarkID = nil } }
+    }
+    @Published var highlightedMarkID: UUID?
+    var highlightedMark: ReadingMark? { marks.first { $0.id == highlightedMarkID } }
     @Published var draftColor = HighlightColor.yellow
     weak var webView: WKWebView?
     private let store = ReadingStore()
@@ -84,6 +88,7 @@ final class ReaderState: ObservableObject {
         isLoading = true
         pageReady = false
         selection = nil
+        highlightedMarkID = nil
         restoreMark = nil
         error = nil
         let accessed = url.startAccessingSecurityScopedResource()
@@ -143,6 +148,7 @@ final class ReaderState: ObservableObject {
         webError = nil
         pageReady = false
         selection = nil
+        highlightedMarkID = nil
         restoreMark = nil
         location = url
         restorePoint = point
@@ -242,6 +248,7 @@ final class ReaderState: ObservableObject {
     func newNote() {
         capture { [weak self] point, quote, selected in
             guard let self, self.storageAvailable else { return }
+            self.highlightedMarkID = nil
             self.draftPoint = point; self.draftQuote = selected?.quote ?? quote; self.draftText = ""
             self.draftSelection = selected; self.draftColor = .yellow
             self.draftSection = self.sectionTitle; self.editingID = nil; self.noteEditor = true
@@ -249,6 +256,7 @@ final class ReaderState: ObservableObject {
     }
 
     func editNote(_ mark: ReadingMark) {
+        highlightedMarkID = nil
         draftPoint = mark.point; draftSection = mark.section; draftQuote = mark.quote
         draftText = mark.text; editingID = mark.id; noteEditor = true
         draftSelection = mark.selection; draftColor = mark.color ?? .yellow
@@ -275,6 +283,7 @@ final class ReaderState: ObservableObject {
         record.marks.removeAll { $0.id == mark.id }
         guard persist() else { record = oldRecord; return }
         marks = record.marks
+        if highlightedMarkID == mark.id { highlightedMarkID = nil }
     }
 
     func jump(to mark: ReadingMark) {
@@ -300,6 +309,7 @@ final class ReaderState: ObservableObject {
             self.record.marks.insert(mark, at: 0)
             guard self.persist() else { self.record = oldRecord; return }
             self.marks = self.record.marks; self.selection = nil
+            self.highlightedMarkID = mark.id
             self.webView?.evaluateJavaScript("window.getSelection().removeAllRanges()", completionHandler: nil)
         }
     }

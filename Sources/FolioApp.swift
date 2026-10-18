@@ -90,6 +90,9 @@ struct ReaderView: View {
                             BookWebView(state: state)
                                 .overlay(alignment: .bottom) {
                                     if state.selection != nil { SelectionToolbar(state: state).padding(16) }
+                                    else if let mark = state.highlightedMark {
+                                        HighlightFeedback(state: state, mark: mark).padding(16)
+                                    }
                                 }
                         }
                         footer(book)

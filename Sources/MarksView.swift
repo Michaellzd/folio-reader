@@ -104,6 +104,27 @@ struct NoteEditorView: View {
     }
 }
 
+struct HighlightFeedback: View {
+    @ObservedObject var state: ReaderState
+    let mark: ReadingMark
+
+    var body: some View {
+        HStack(spacing: 12) {
+            Label(state.t("已标注"), systemImage: "checkmark")
+                .font(.system(size: 12)).foregroundStyle(state.muted)
+            Button(state.t("添加笔记")) { state.editNote(mark) }
+                .buttonStyle(.bordered).font(.system(size: 12))
+            Button { state.highlightedMarkID = nil } label: {
+                Image(systemName: "xmark").font(.system(size: 11))
+                    .frame(width: 24, height: 24).contentShape(Rectangle())
+            }.buttonStyle(.plain).help(state.t("关闭提示")).accessibilityLabel(state.t("关闭提示"))
+        }.padding(.horizontal, 16).padding(.vertical, 10)
+            .background(state.paper, in: RoundedRectangle(cornerRadius: 10))
+            .overlay(RoundedRectangle(cornerRadius: 10).stroke(state.muted.opacity(0.25)))
+            .shadow(color: .black.opacity(0.12), radius: 12, x: 0, y: 4)
+    }
+}
+
 struct SelectionToolbar: View {
     @ObservedObject var state: ReaderState
     var body: some View {

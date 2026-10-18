@@ -25,6 +25,8 @@ enum L10n {
     // Chinese source keys; each row contains English, Japanese, and Spanish.
     static let translations: [String: [String]] = [
         "标注": ["Highlight", "ハイライト", "Resaltar"],
+        "已标注": ["Highlighted", "ハイライトしました", "Texto resaltado"],
+        "关闭提示": ["Dismiss", "閉じる", "Cerrar aviso"],
         "标注颜色": ["Highlight color", "ハイライトの色", "Color del resaltado"],
         "黄色": ["Yellow", "黄色", "Amarillo"],
         "绿色": ["Green", "緑", "Verde"],

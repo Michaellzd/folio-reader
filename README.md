@@ -51,7 +51,7 @@ Folio 是一款简单的 Mac EPUB 阅读器。下载上面的 ZIP，解压后把
 
 **Save a bookmark.** Click the bookmark icon in the top bar, or press **⌘S**, to keep a fixed reference point without changing your automatic reading progress. Open **Bookmarks & notes** to revisit saved items.
 
-**Highlight a passage.** Select text in the book. A small toolbar appears at the bottom of the reading area; choose **yellow, green, blue, or pink** to apply a persistent highlight. Text can span paragraphs and inline formatting. Overlapping highlights are supported; the most recently applied color is visible in overlaps.
+**Highlight a passage.** Select text in the book. A small toolbar appears at the bottom of the reading area; choose **yellow, green, blue, or pink** to apply a persistent highlight. A **Highlighted → Add note** prompt then lets you attach a note to that exact passage without selecting it again. Dismiss the prompt to continue reading; the highlight is already saved. Text can span paragraphs and inline formatting. Overlapping highlights are supported; the most recently applied color is visible in overlaps.
 
 **Attach a note.** Select text and choose **Add note**, then choose a color, write your note, and click **Save note**. You can also click an existing highlight to add or edit its note. The top-bar note button and **⇧⌘N** also work for notes at the current position without selected text. Notes are saved when you click Save note or use the save shortcut; Cancel discards the editor's unsaved changes.
 
@@ -65,15 +65,15 @@ Folio 是一款简单的 Mac EPUB 阅读器。下载上面的 ZIP，解压后把
 
 ### 使用方法
 
-阅读位置会自动保存，下次启动直接继续。点顶部书签或按 **⌘S** 可以额外保存一个固定位置。选中文字后，在底部浮动工具栏选择黄、绿、蓝、粉色进行标注；点“添加笔记”可选择颜色并记录想法。点已有标注可以补充或编辑笔记，保存后重新打开仍会显示。在侧栏“书签与笔记”中可以跳回原文、编辑或删除。笔记编辑器需要点“保存笔记”或按快捷键保存，取消会放弃本次编辑。
+阅读位置会自动保存，下次启动直接继续。点顶部书签或按 **⌘S** 可以额外保存一个固定位置。选中文字后，在底部浮动工具栏选择黄、绿、蓝、粉色进行标注。成功后会提示“已标注”，点旁边的“添加笔记”即可为刚才的原文记录想法，无需重新选择；关闭提示也会保留标注。点已有标注可以补充或编辑笔记，保存后重新打开仍会显示。在侧栏“书签与笔记”中可以跳回原文、编辑或删除。笔记编辑器需要点“保存笔记”或按快捷键保存，取消会放弃本次编辑。
 
 ### 日本語
 
-読書位置は自動保存され、次回の起動時に続きから開きます。**⌘S** でしおりを保存できます。本文を選択すると下部にツールバーが表示され、黄・緑・青・ピンクでハイライトできます。「メモを追加」でメモと色を保存し、既存のハイライトをクリックすると編集できます。「しおりとメモ」の一覧から原文に戻れます。
+読書位置は自動保存され、次回の起動時に続きから開きます。**⌘S** でしおりを保存できます。本文を選択すると下部にツールバーが表示され、黄・緑・青・ピンクでハイライトできます。保存後の「ハイライトしました」表示から「メモを追加」を押すと、選択し直さずに同じ箇所へメモを付けられます。「メモを追加」でメモと色を保存し、既存のハイライトをクリックすると編集できます。「しおりとメモ」の一覧から原文に戻れます。
 
 ### Español
 
-La posición se guarda automáticamente y la app reanuda la lectura al abrirse. Usa **⌘S** para guardar un marcador. Selecciona texto y elige amarillo, verde, azul o rosa en la barra inferior para resaltarlo. **Añadir nota** permite guardar un comentario y un color; haz clic en un resaltado existente para editar su nota. La pestaña **Marcadores y notas** permite volver al pasaje, editar o eliminar elementos.
+La posición se guarda automáticamente y la app reanuda la lectura al abrirse. Usa **⌘S** para guardar un marcador. Selecciona texto y elige amarillo, verde, azul o rosa en la barra inferior para resaltarlo. Tras guardarlo, el aviso **Texto resaltado** ofrece **Añadir nota** para comentar ese mismo pasaje sin volver a seleccionarlo. **Añadir nota** permite guardar un comentario y un color; haz clic en un resaltado existente para editar su nota. La pestaña **Marcadores y notas** permite volver al pasaje, editar o eliminar elementos.
 
 ## Privacy
 
