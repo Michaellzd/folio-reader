@@ -51,7 +51,7 @@ enum L10n {
         "笔记保存在本机，关联到当前阅读位置。": ["Notes stay on this Mac and link back to your reading position.", "メモはこのMacに保存され、読書中の位置に戻れます。", "Las notas se guardan en este Mac y enlazan a tu posición de lectura."],
         "无法保存阅读数据，请重试。": ["Reading data could not be saved. Please try again.", "読書データを保存できませんでした。再度お試しください。", "No se pudieron guardar los datos de lectura. Inténtalo de nuevo."],
         "已保存的数据无法读取，为避免覆盖，请先备份本机阅读数据。": ["Saved data could not be read. Back up this Mac's reading data before repairing it; existing data will not be overwritten.", "保存データを読み込めません。既存のデータは上書きしません。修復する前に読書データをバックアップしてください。", "No se pudieron leer los datos guardados. Haz una copia de seguridad antes de repararlos; no se sobrescribirán los datos existentes."],
-        "书页": ["Folio", "Folio", "Folio"],
+        "Folio": ["Folio", "Folio", "Folio"],
         "打开 EPUB…": ["Open EPUB…", "EPUBを開く…", "Abrir EPUB…"],
         "打开 EPUB": ["Open EPUB", "EPUBを開く", "Abrir EPUB"],
         "打开": ["Open", "開く", "Abrir"],

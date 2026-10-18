@@ -1,7 +1,7 @@
 #!/bin/zsh
 set -euo pipefail
 cd "${0:A:h}"
-APP="${APP_OUTPUT:-$PWD/build/书页.app}"
+APP="${APP_OUTPUT:-$PWD/build/Folio.app}"
 mkdir -p "$APP/Contents/MacOS" "$APP/Contents/Resources"
 for ARCH in arm64 x86_64; do
   xcrun swiftc -O -parse-as-library -target "$ARCH-apple-macosx14.0" \

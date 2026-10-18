@@ -1,4 +1,4 @@
-# Folio · 书页
+# Folio
 
 A small, quiet EPUB reader for Mac. Open a book and start reading.
 
@@ -13,8 +13,8 @@ Native SwiftUI and WebKit. Local files, no account, no server, no third-party ru
 Choose **Folio-macOS-universal.zip** under release assets. The source-code archives are for developers. Requires **macOS 14 or later**; the universal app contains Apple Silicon and Intel builds. Apple Silicon is tested locally; Intel is cross-compiled.
 
 1. Download and unzip the application archive.
-2. Drag **书页.app** to Applications and open it.
-3. Click **Open EPUB**, press **⌘O**, or drop an EPUB onto the window. Finder's **Open With → 书页** also works.
+2. Drag **Folio.app** to Applications and open it.
+3. Click **Open EPUB**, press **⌘O**, or drop an EPUB onto the window. Finder's **Open With → Folio** also works.
 
 The current release uses an ad hoc signature and is **not Apple-notarized**. For a downloaded app, macOS may require **System Settings → Privacy & Security → Open Anyway** after the first launch attempt. See [Apple's instructions](https://support.apple.com/en-us/102445).
 
@@ -41,7 +41,7 @@ The book stays in its original language. DRM-encrypted books, ZIP64 archives, fi
 
 ## 中文
 
-书页是一款简单的 Mac EPUB 阅读器。下载上面的 ZIP，解压后把 **书页.app** 拖进“应用程序”。打开 EPUB 即可阅读，支持拖入文件、目录跳转、字号调整、日夜主题和阅读位置保存。
+Folio 是一款简单的 Mac EPUB 阅读器。下载上面的 ZIP，解压后把 **Folio.app** 拖进“应用程序”。打开 EPUB 即可阅读，支持拖入文件、目录跳转、字号调整、日夜主题和阅读位置保存。
 
 支持中、英、日、西班牙语界面，在右上角的阅读设置中切换。书籍正文保留原文。所有阅读操作都在本地完成。
 
@@ -89,7 +89,7 @@ Install Apple's Command Line Tools (`xcode-select --install`). Swift 6+ and macO
 ./test.sh
 ./test-web.sh
 ./build.sh
-open build/书页.app
+open build/Folio.app
 ./package.sh
 ```
 

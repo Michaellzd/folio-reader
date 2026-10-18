@@ -1,4 +1,4 @@
-# Folio / 书页
+# Folio
 
 <!-- impeccable:product-schema 1 -->
 
@@ -28,3 +28,6 @@ The user requested public source, AGENTS.md, README with links to their other pr
 
 ## Saved reading and annotations
 The user requested closing and reopening without losing their place, manual saves/bookmarks, colored text highlights, and notes attached to highlighted passages. All associated UI must follow the selected language. Document the workflows in README. Persist reading data locally; retain original excerpts and note text. Opening the last available book automatically is authorized by this request.
+
+## Product name
+Use **Folio** as the product name in every language, app window, macOS bundle, distribution archive, and public document. The user explicitly requested English-only product branding. Keep the existing four interface languages and reading-data identity.

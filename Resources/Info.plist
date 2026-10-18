@@ -2,18 +2,18 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0"><dict>
     <key>CFBundleName</key><string>Folio</string>
-    <key>CFBundleDisplayName</key><string>书页</string>
+    <key>CFBundleDisplayName</key><string>Folio</string>
     <key>CFBundleIdentifier</key><string>local.folio.reader</string>
     <key>CFBundleExecutable</key><string>Folio</string>
     <key>CFBundlePackageType</key><string>APPL</string>
-    <key>CFBundleShortVersionString</key><string>1.1.0</string>
-    <key>CFBundleVersion</key><string>2</string>
+    <key>CFBundleShortVersionString</key><string>1.1.1</string>
+    <key>CFBundleVersion</key><string>3</string>
     <key>CFBundleIconFile</key><string>AppIcon</string>
     <key>LSMinimumSystemVersion</key><string>14.0</string>
     <key>NSHighResolutionCapable</key><true/>
     <key>NSPrincipalClass</key><string>NSApplication</string>
     <key>CFBundleDocumentTypes</key><array><dict>
-        <key>CFBundleTypeName</key><string>EPUB 电子书</string>
+        <key>CFBundleTypeName</key><string>EPUB book</string>
         <key>CFBundleTypeRole</key><string>Viewer</string>
         <key>LSHandlerRank</key><string>Alternate</string>
         <key>LSItemContentTypes</key><array><string>org.idpf.epub-container</string></array>
@@ -21,7 +21,7 @@
     </dict></array>
     <key>UTImportedTypeDeclarations</key><array><dict>
         <key>UTTypeIdentifier</key><string>org.idpf.epub-container</string>
-        <key>UTTypeDescription</key><string>EPUB 电子书</string>
+        <key>UTTypeDescription</key><string>EPUB book</string>
         <key>UTTypeConformsTo</key><array><string>public.data</string><string>public.content</string></array>
         <key>UTTypeTagSpecification</key><dict>
             <key>public.filename-extension</key><array><string>epub</string></array>

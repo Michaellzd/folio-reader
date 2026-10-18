@@ -2,7 +2,7 @@
 
 ## Product
 
-Folio (书页) is a small native macOS EPUB reader. The primary task is opening a local EPUB and reading it immediately. Keep reading central. New accounts, cloud services, libraries, AI features, and dependencies need a concrete product reason.
+Folio is a small native macOS EPUB reader. The primary task is opening a local EPUB and reading it immediately. Keep reading central. New accounts, cloud services, libraries, AI features, and dependencies need a concrete product reason.
 
 Read PRODUCT.md and DESIGN.md before changing the UI. The initial design used Taste and Impeccable; preserve its restrained native Mac controls, warm paper, legible serif text, and collapsible contents.
 

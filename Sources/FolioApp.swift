@@ -6,7 +6,7 @@ struct FolioApp: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) var delegate
     @StateObject private var state = ReaderState.shared
     var body: some Scene {
-        Window("书页", id: "reader") {
+        Window("Folio", id: "reader") {
             ReaderView(state: state)
                 .frame(minWidth: 620, minHeight: 440)
                 .preferredColorScheme(state.dark ? .dark : .light)
@@ -153,7 +153,7 @@ struct ReaderView: View {
                 Text(book.title).font(.system(size: 12, weight: .medium)).foregroundStyle(state.muted)
                     .lineLimit(1).truncationMode(.middle)
             } else {
-                Text(state.t("书页")).font(.system(size: 13, weight: .medium)).foregroundStyle(state.muted)
+                Text(state.t("Folio")).font(.system(size: 13, weight: .medium)).foregroundStyle(state.muted)
             }
             Spacer(minLength: 20)
             tool(state.t("阅读外观"), icon: "textformat.size") { state.appearancePanel.toggle() }
@@ -194,7 +194,7 @@ struct ReaderView: View {
                 }.buttonStyle(.plain).padding(.top, 32)
             }
             Spacer()
-            Text("书页  /  FOLIO").font(.system(size: 10, weight: .medium)).tracking(3)
+            Text("FOLIO").font(.system(size: 10, weight: .medium)).tracking(3)
                 .foregroundStyle(state.muted).padding(.bottom, 28)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
