@@ -1,3 +1,4 @@
+# Optional template: copy to .github/workflows/release.yml to enable.
 name: Build and release macOS app
 on:
   push:

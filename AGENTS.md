@@ -46,4 +46,4 @@ Pass explicit local EPUB paths to `./test.sh /path/to/book.epub` for additional 
 
 ## Releases
 
-`./package.sh` creates a universal arm64/x86_64 `.app` ZIP, a versioned copy, and SHA256SUMS in `dist/`. `v*` tags trigger `.github/workflows/release.yml`, which tests, builds, and uploads real application assets to GitHub Releases. Use the existing version in Info.plist and update release notes with user-visible changes. Do not claim Apple notarization without Developer ID signing and a successful notarization ticket. The default build uses an ad hoc signature.
+`./package.sh` creates a universal arm64/x86_64 `.app` ZIP, a versioned copy, and SHA256SUMS in `dist/`. Releases can be published through GitHub CLI. An optional automation template is stored at `Tools/github-release-workflow.yml`; it is not active until installed under `.github/workflows/` using credentials with workflow-editing permission. Use the existing version in Info.plist and update release notes with user-visible changes. Do not claim Apple notarization without Developer ID signing and a successful notarization ticket. The default build uses an ad hoc signature.
